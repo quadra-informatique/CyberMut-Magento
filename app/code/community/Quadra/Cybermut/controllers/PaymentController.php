@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * 1997-2012 Quadra Informatique
  *
  * NOTICE OF LICENSE
@@ -15,7 +15,6 @@
  *  @version Release: $Revision: 2.0.5 $
  *  @license http://www.opensource.org/licenses/OSL-3.0  Open Software License (OSL 3.0)
  */
-
 class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Action {
 
     protected $_cybermutResponse = null;
@@ -99,10 +98,7 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
                 return;
             }
 
-            $order->addStatusToHistory(
-                $order->getStatus(),
-                Mage::helper('cybermut')->__('Customer was redirected to Cybermut')
-            );
+            $order->addStatusHistoryComment(Mage::helper('cybermut')->__('Customer was redirected to Cybermut'));
             $order->save();
         }
 
@@ -176,8 +172,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
                         $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, $status, $message);
                     } else if ($status == Mage_Sales_Model_Order::STATE_COMPLETE) {
                         $this->saveInvoice($order);
-                        if($order->canShip()) {
-                            $itemQty =  $order->getItemsCollection()->count();
+                        if ($order->canShip()) {
+                            $itemQty = $order->getItemsCollection()->count();
                             $shipment = Mage::getModel('sales/service_order', $order)->prepareShipment($itemQty);
                             $shipment = new Mage_Sales_Model_Order_Shipment_Api();
                             $shipment->create($order->getIncrementId());
@@ -209,14 +205,12 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
                         $status = $order->getStatus();
                     }
 
-                    $order->addStatusToHistory(
-                            $status, $messageError
-                    );
-
                     if ($status == Mage_Sales_Model_Order::STATE_HOLDED && $order->canHold()) {
                         $order->hold();
+                    } elseif ($status == Mage_Sales_Model_Order::STATE_CANCELED && $order->canCancel()) {
+                        $order->cancel();
                     }
-
+                    $order->addStatusHistoryComment($messageError);
                     $order->save();
                 }
             }
@@ -229,11 +223,9 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
         } else {
             foreach ($this->getRealOrderIds() as $realOrderId) {
                 $order = Mage::getModel('sales/order')->loadByIncrementId($realOrderId);
-                $order->addStatusToHistory(
-                        $order->getStatus(), Mage::helper('cybermut')->__('Returned MAC is invalid. Order cancelled.')
-                );
                 if ($order->canCancel())
                     $order->cancel();
+                $order->addStatusHistoryComment(Mage::helper('cybermut')->__('Returned MAC is invalid. Order cancelled.'));
                 $order->save();
             }
             $model->generateErrorResponse();
@@ -246,37 +238,22 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      *  @param    Mage_Sales_Model_Order $order
      *  @return	  boolean Can save invoice or not
      */
-    protected function saveInvoice(Mage_Sales_Model_Order $order) {
+    protected function saveInvoice(Mage_Sales_Model_Order $order, $ship = false) {
         if ($order->canInvoice()) {
-
-            $version = Mage::getVersion();
-            $version = substr($version, 0, 5);
-            $version = str_replace('.', '', $version);
-            while (strlen($version) < 3) {
-                $version .= "0";
-            }
-
-            if (((int) $version) < 111) {
-                $convertor = Mage::getModel('sales/convert_order');
-                $invoice = $convertor->toInvoice($order);
-                foreach ($order->getAllItems() as $orderItem) {
-                    if (!$orderItem->getQtyToInvoice()) {
-                        continue;
-                    }
-                    $item = $convertor->itemToInvoiceItem($orderItem);
-                    $item->setQty($orderItem->getQtyToInvoice());
-                    $invoice->addItem($item);
-                }
-                $invoice->collectTotals();
-            } else {
-                $invoice = $order->prepareInvoice();
-            }
-
+            $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
             $invoice->register()->capture();
-            Mage::getModel('core/resource_transaction')
+
+            $transactionSave = Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
-                    ->addObject($invoice->getOrder())
-                    ->save();
+                    ->addObject($invoice->getOrder());
+
+            if ($ship && $order->canShip()) {
+                $shipment = Mage::getModel('sales/service_order', $order)->prepareShipment();
+                $shipment->register();
+                $transactionSave->addObject($shipment);
+            }
+
+            $transactionSave->save();
             return true;
         }
 
@@ -294,7 +271,6 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
         $session->setQuoteId($session->getCybermutPaymentQuoteId());
         $session->unsCybermutPaymentQuoteId();
         $session->setCanRedirect(false);
-
         $session->setIsMultishipping(false);
 
         if ($this->getQuote()->getIsMultiShipping())
@@ -308,10 +284,7 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
                 return;
             }
 
-            $order->addStatusToHistory(
-                    $order->getStatus(), Mage::helper('cybermut')->__('Customer successfully returned from Cybermut')
-            );
-
+            $order->addStatusHistoryComment(Mage::helper('cybermut')->__('Customer successfully returned from Cybermut'));
             $order->save();
 
             if ($this->getQuote()->getIsMultiShipping())
@@ -343,40 +316,22 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
 
         $session->setIsMultishipping(false);
 
-        if ($this->getQuote()->getIsMultiShipping())
-            $orderIds = array();
-
         foreach ($this->getRealOrderIds() as $realOrderId) {
             $order = Mage::getModel('sales/order')->loadByIncrementId($realOrderId);
 
             if (!$order->getId()) {
-
-                //$this->_redirect('checkout/onepage/error');
-                //return;
+                continue;
             } else if ($order instanceof Mage_Sales_Model_Order && $order->getId()) {
-                /* $order->addStatusToHistory(
-                  $model->getConfigData('order_status_payment_canceled'),
-                  Mage::helper('cybermut')->__('Customer returned from Cybermut.')
-                  );
-
-                  if ($model->getConfigData('order_status_payment_canceled') == Mage_Sales_Model_Order::STATE_CANCELED) {
-                  $order->cancel();
-                  } */
-
                 if (!$status = $model->getConfigData('order_status_payment_canceled')) {
                     $status = $order->getStatus();
                 }
 
-                $order->addStatusToHistory(
-                        $status, $this->__('Order was canceled by customer')
-                );
-
                 if ($status == Mage_Sales_Model_Order::STATE_HOLDED && $order->canHold()) {
                     $order->hold();
-                } else if ($status == Mage_Sales_Model_Order::STATE_CANCELED && $order->canCancel()) {
+                } elseif ($status == Mage_Sales_Model_Order::STATE_CANCELED && $order->canCancel()) {
                     $order->cancel();
                 }
-
+                $order->addStatusHistoryComment($this->__('Order was canceled by customer'));
                 $order->save();
             }
         }
