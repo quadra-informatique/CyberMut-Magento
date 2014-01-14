@@ -184,12 +184,11 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
                         }
                         $order->addStatusToHistory($status, $message, true);
                     }
+                    $order->save();
 
                     if (!$order->getEmailSent()) {
                         $order->sendNewOrderEmail();
                     }
-
-                    $order->save();
                 }
             } else {
                 foreach ($this->getRealOrderIds() as $realOrderId) {
