@@ -231,7 +231,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
             'texte-libre' => $description,
             'lgue' => $this->_getLanguageCode(),
             'societe' => $this->getConfigData('site_code'),
-            'url_retour' => Mage::getUrl(),
+            'url_retour' => $this->getNotifyURL(),
             'url_retour_ok' => $this->getSuccessURL(),
             'url_retour_err' => $this->getErrorURL(),
             'bouton' => 'ButtonLabel'
