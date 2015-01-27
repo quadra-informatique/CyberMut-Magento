@@ -11,7 +11,7 @@
  * to ecommerce@quadra-informatique.fr so we can send you a copy immediately.
  *
  *  @author Quadra Informatique <ecommerce@quadra-informatique.fr>
- *  @copyright 1997-2013 Quadra Informatique
+ *  @copyright 1997-2015 Quadra Informatique
  *  @version Release: $Revision: 2.0.5 $
  *  @license http://www.opensource.org/licenses/OSL-3.0  Open Software License (OSL 3.0)
  */
