@@ -234,3 +234,5 @@
 /app/locale/fr_FR/Mage_Tax.csv
 /app/locale/fr_FR/Mage_Checkout.csv
 /app/locale/fr_FR/Mage_Api2.csv
+/app/code/community/Quadra/Extensions/
+/app/etc/modules/Quadra_Extensions.xml

@@ -1,41 +1,40 @@
 <?php
-/*
- * 1997-2012 Quadra Informatique
+
+/**
+ * 1997-2015 Quadra Informatique
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0) that is available
  * through the world-wide-web at this URL: http://www.opensource.org/licenses/OSL-3.0
  * If you are unable to obtain it through the world-wide-web, please send an email
- * to ecommerce@quadra-informatique.fr so we can send you a copy immediately.
+ * to modules@quadra-informatique.fr so we can send you a copy immediately.
  *
- *  @author Quadra Informatique <ecommerce@quadra-informatique.fr>
- *  @copyright 1997-2015 Quadra Informatique
- *  @version Release: $Revision: 2.0.5 $
- *  @license http://www.opensource.org/licenses/OSL-3.0  Open Software License (OSL 3.0)
+ * @author Quadra Informatique <modules@quadra-informatique.fr>
+ * @copyright 1997-2015 Quadra Informatique
+ * @license http://www.opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
-
 class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
 {
-    protected $_code  = 'cybermut_payment';
+
+    protected $_code = 'cybermut_payment';
     protected $_formBlockType = 'cybermut/form';
 
     // Cybermut return codes of payment
-    const RETURN_CODE_ACCEPTED      = 'paiement';
+    const RETURN_CODE_ACCEPTED = 'paiement';
     const RETURN_CODE_TEST_ACCEPTED = 'payetest';
-    const RETURN_CODE_ERROR         = 'Annulation';
+    const RETURN_CODE_ERROR = 'Annulation';
 
     // Payment configuration
-    protected $_isGateway               = false;
-    protected $_canAuthorize            = true;
-    protected $_canCapture              = true;
-    protected $_canCapturePartial       = false;
-    protected $_canRefund               = false;
-    protected $_canVoid                 = false;
-    protected $_canUseInternal          = false;
-    protected $_canUseCheckout          = true;
-    protected $_canUseForMultishipping  = true;
-
+    protected $_isGateway = false;
+    protected $_canAuthorize = true;
+    protected $_canCapture = true;
+    protected $_canCapturePartial = false;
+    protected $_canRefund = false;
+    protected $_canVoid = false;
+    protected $_canUseInternal = false;
+    protected $_canUseCheckout = true;
+    protected $_canUseForMultishipping = true;
     // Order instance
     protected $_order = null;
 
@@ -122,7 +121,8 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      *
      * @return Mage_Sales_Model_Quote
      */
-    public function getQuote() {
+    public function getQuote()
+    {
         if (!$this->_quote) {
             $quoteId = Mage::getSingleton('checkout/session')->getLastQuoteId();
             $this->_quote = Mage::getModel('sales/quote')->load($quoteId);
@@ -196,7 +196,8 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
         return Mage::getUrl('cybermut/payment/redirect');
     }
 
-    public function getAmount() {
+    public function getAmount()
+    {
         if ($this->getQuote()->getIsMultiShipping()) {
             $amount = $this->getQuote()->getBaseGrandTotal();
         } else {
@@ -237,7 +238,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
             'bouton' => 'ButtonLabel'
         );
 
-        if (((int) $this->getVersion()) >= 3) {
+        if (((int)$this->getVersion()) >= 3) {
             $fields['mail'] = $order->getCustomerEmail();
         }
 
@@ -264,23 +265,23 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
                 $fields['nbrech'] = $nbTerms;
 
                 $terms = array(
-                    'montantech1' => round($amount/$nbTerms, 2),
+                    'montantech1' => round($amount / $nbTerms, 2),
                     'dateech1' => date('d/m/Y'));
 
-                for ($i=2; $i<$nbTerms+1; $i++) {
-                    $terms['montantech'.$i] = $terms['montantech1'];
-                    $dateech = '+ '.($i-1).' month';
-                    $terms['dateech'.$i] = date('d/m/Y', strtotime($dateech));
+                for ($i = 2; $i < $nbTerms + 1; $i++) {
+                    $terms['montantech' . $i] = $terms['montantech1'];
+                    $dateech = '+ ' . ($i - 1) . ' month';
+                    $terms['dateech' . $i] = date('d/m/Y', strtotime($dateech));
                 }
 
-                if ($terms['montantech1']*$nbTerms != $amount) {
-                    $result = $terms['montantech1']*($nbTerms-1);
-                    $terms['montantech1'] = $amount-$result;
+                if ($terms['montantech1'] * $nbTerms != $amount) {
+                    $result = $terms['montantech1'] * ($nbTerms - 1);
+                    $terms['montantech1'] = $amount - $result;
                 }
 
                 $order = $this->getOrder();
-                for ($i=1; $i<$nbTerms+1; $i++) {
-                    $terms['montantech'.$i] = sprintf('%.2f', $terms['montantech'.$i]) . $order->getBaseCurrencyCode();
+                for ($i = 1; $i < $nbTerms + 1; $i++) {
+                    $terms['montantech' . $i] = sprintf('%.2f', $terms['montantech' . $i]) . $order->getBaseCurrencyCode();
                 }
 
                 $fields = array_merge($fields, $terms);
@@ -330,7 +331,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      */
     protected function _getMAC($data)
     {
-    	if (((int) $this->getVersion()) >= 3) {
+        if (((int)$this->getVersion()) >= 3) {
             $string = sprintf('%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*', $data['TPE'], $data['date'], $data['montant'], $data['reference'], $data['texte-libre'], $data['version'], $data['lgue'], $data['societe'], $data['mail'], "", "", "", "", "", "", "", "", "");
         } else {
             $string = sprintf('%s*%s*%s*%s*%s*%s*%s*%s*', $data['TPE'], $data['date'], $data['montant'], $data['reference'], $data['texte-libre'], $data['version'], $data['lgue'], $data['societe']);
@@ -347,7 +348,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      */
     public function getResponseMAC($data)
     {
-    	if (((int) $this->getVersion()) >= 3) {
+        if (((int)$this->getVersion()) >= 3) {
             if (!array_key_exists('numauto', $data)) {
                 $data['numauto'] = "";
             }
@@ -412,16 +413,16 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      *  @param    none
      *  @return	  string encrypted key
      */
-    /*protected function _getKeyEncrypted()
-    {
-        $key = $this->getConfigData('key_encrypted');
-        $key = Mage::helper('core')->decrypt($key);
+    /* protected function _getKeyEncrypted()
+      {
+      $key = $this->getConfigData('key_encrypted');
+      $key = Mage::helper('core')->decrypt($key);
 
-        $avant_dernier_tranforme = (ord(substr($key, strlen($key) - 2, 1)) - 23);
-        $key = substr($key, 0, strlen($key) - 2) . chr($avant_dernier_tranforme) . substr($key, strlen($key) - 1, 1);
+      $avant_dernier_tranforme = (ord(substr($key, strlen($key) - 2, 1)) - 23);
+      $key = substr($key, 0, strlen($key) - 2) . chr($avant_dernier_tranforme) . substr($key, strlen($key) - 1, 1);
 
-        return pack("H*", $key);
-    }*/
+      return pack("H*", $key);
+      } */
 
     protected function _getKeyEncrypted()
     {
@@ -470,7 +471,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      */
     protected function _CMCIC_hmac_KeyEncrypted($string)
     {
-    	$key = $this->_getKeyEncrypted();
+        $key = $this->_getKeyEncrypted();
 
         $length = 64; // block length for SHA1
         if (strlen($key) > $length) {
@@ -483,7 +484,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
         $k_ipad = $key ^ $ipad;
         $k_opad = $key ^ $opad;
 
-        return sha1($k_opad  . pack("H*",sha1($k_ipad . $string)));
+        return sha1($k_opad . pack("H*", sha1($k_ipad . $string)));
     }
 
     /**
@@ -495,7 +496,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      */
     protected function _CMCIC_hmac_KeyPassphrase($string)
     {
-    	$pass = $this->_getSHAKey();
+        $pass = $this->_getSHAKey();
         $k1 = pack("H*", sha1($this->_getSHAKey()));
         $l1 = strlen($k1);
         $k2 = pack("H*", $this->_getKey());
@@ -528,7 +529,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
         $k_ipad = $key ^ $ipad;
         $k_opad = $key ^ $opad;
 
-        return sha1($k_opad  . pack("H*",sha1($k_ipad . $string)));
+        return sha1($k_opad . pack("H*", sha1($k_ipad . $string)));
     }
 
     /**
@@ -537,24 +538,24 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      *  @param    none
      *  @return	  string MAC
      */
-     /* <FONCTION OBSOLETE>
-    protected function _CMCIC_hmac($string)
-    {
-        $pass = $this->_getSHAKey();
-        $k1 = pack("H*", sha1($this->_getSHAKey()));
-        $l1 = strlen($k1);
-        $k2 = pack("H*", $this->_getKey());
-        $l2 = strlen($k2);
-        if ($l1 > $l2) {
-            $k2 = str_pad($k2, $l1, chr(0x00));
-        } elseif ($l2 > $l1) {
-            $k1 = str_pad($k1, $l2, chr(0x00));
-        }
+    /* <FONCTION OBSOLETE>
+      protected function _CMCIC_hmac($string)
+      {
+      $pass = $this->_getSHAKey();
+      $k1 = pack("H*", sha1($this->_getSHAKey()));
+      $l1 = strlen($k1);
+      $k2 = pack("H*", $this->_getKey());
+      $l2 = strlen($k2);
+      if ($l1 > $l2) {
+      $k2 = str_pad($k2, $l1, chr(0x00));
+      } elseif ($l2 > $l1) {
+      $k1 = str_pad($k1, $l2, chr(0x00));
+      }
 
-        return strtolower($this->_hmacSHA1($k1 ^ $k2, $string));
-    }
+      return strtolower($this->_hmacSHA1($k1 ^ $k2, $string));
+      }
 
-    <FONCTION OBSOLETE> */
+      <FONCTION OBSOLETE> */
 
     /**
      *  MAC generation algorithm
@@ -563,23 +564,23 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      *  @return	  string MAC
      */
     /* <FONCTION OBSOLETE>
-    protected function _hmacSHA1($key, $string)
-    {
-        $length = 64; // block length for SHA1
-        if (strlen($key) > $length) {
-            $key = pack("H*", sha1($key));
-        }
+      protected function _hmacSHA1($key, $string)
+      {
+      $length = 64; // block length for SHA1
+      if (strlen($key) > $length) {
+      $key = pack("H*", sha1($key));
+      }
 
-        $key = str_pad($key, $length, chr(0x00));
-        $ipad = str_pad('', $length, chr(0x36));
-        $opad = str_pad('', $length, chr(0x5c));
-        $k_ipad = $key ^ $ipad;
-        $k_opad = $key ^ $opad;
+      $key = str_pad($key, $length, chr(0x00));
+      $ipad = str_pad('', $length, chr(0x36));
+      $opad = str_pad('', $length, chr(0x5c));
+      $k_ipad = $key ^ $ipad;
+      $k_opad = $key ^ $opad;
 
-        return sha1($k_opad  . pack("H*",sha1($k_ipad . $string)));
-    }
+      return sha1($k_opad  . pack("H*",sha1($k_ipad . $string)));
+      }
 
-    </FONCTIONS OBSOLETES> */
+      </FONCTIONS OBSOLETES> */
 
     /**
      * Return authorized languages by CyberMUT
@@ -666,7 +667,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      */
     public function getSuccessResponse()
     {
-    	if (((int) $this->getVersion()) >= 3) {
+        if (((int)$this->getVersion()) >= 3) {
             $response = array(
                 'version=2',
                 'cdr=0'
@@ -691,7 +692,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
      */
     public function getErrorResponse()
     {
-    	if (((int) $this->getVersion()) >= 3) {
+        if (((int)$this->getVersion()) >= 3) {
             $response = array(
                 'version=2',
                 'cdr=1'
@@ -712,7 +713,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
     {
         $msg = Mage::helper('cybermut')->__('Payment accepted by Cybermut');
 
-        if (((int) $this->getVersion()) >= 3 && array_key_exists('numauto', $postData)) {
+        if (((int)$this->getVersion()) >= 3 && array_key_exists('numauto', $postData)) {
             $msg .= "<br />" . Mage::helper('cybermut')->__('Number of authorization: %s', $postData['numauto']);
             $msg .= "<br />" . Mage::helper('cybermut')->__('Was the visual cryptogram seized: %s', $postData['cvx']);
             $msg .= "<br />" . Mage::helper('cybermut')->__('Validity of the card: %s', $postData['vld']);
@@ -726,7 +727,7 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
     {
         $msg = Mage::helper('cybermut')->__('Payment refused by Cybermut');
 
-        if (((int) $this->getVersion()) >= 3 && array_key_exists('motifrefus', $postData)) {
+        if (((int)$this->getVersion()) >= 3 && array_key_exists('motifrefus', $postData)) {
             $msg .= "<br />" . Mage::helper('cybermut')->__('Motive for refusal: %s', $postData['motifrefus']);
             $msg .= "<br />" . Mage::helper('cybermut')->__('Was the visual cryptogram seized: %s', $postData['cvx']);
             $msg .= "<br />" . Mage::helper('cybermut')->__('Validity of the card: %s', $postData['vld']);
@@ -735,4 +736,5 @@ class Quadra_Cybermut_Model_Payment extends Mage_Payment_Model_Method_Abstract
 
         return $msg;
     }
+
 }

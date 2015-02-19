@@ -1,21 +1,21 @@
 <?php
 
 /**
- * 1997-2012 Quadra Informatique
+ * 1997-2015 Quadra Informatique
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0) that is available
  * through the world-wide-web at this URL: http://www.opensource.org/licenses/OSL-3.0
  * If you are unable to obtain it through the world-wide-web, please send an email
- * to ecommerce@quadra-informatique.fr so we can send you a copy immediately.
+ * to modules@quadra-informatique.fr so we can send you a copy immediately.
  *
- *  @author Quadra Informatique <ecommerce@quadra-informatique.fr>
- *  @copyright 1997-2015 Quadra Informatique
- *  @version Release: $Revision: 2.0.5 $
- *  @license http://www.opensource.org/licenses/OSL-3.0  Open Software License (OSL 3.0)
+ * @author Quadra Informatique <modules@quadra-informatique.fr>
+ * @copyright 1997-2015 Quadra Informatique
+ * @license http://www.opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
-class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Action {
+class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Action
+{
 
     protected $_cybermutResponse = null;
     protected $_realOrderIds;
@@ -26,7 +26,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      *
      * @return Mage_Sales_Model_Quote
      */
-    public function getQuote() {
+    public function getQuote()
+    {
         if (!$this->_quote) {
             $session = Mage::getSingleton('checkout/session');
             $this->_quote = Mage::getModel('sales/quote')->load($session->getCybermutPaymentQuoteId());
@@ -47,7 +48,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      *
      * @return array
      */
-    public function getRealOrderIds() {
+    public function getRealOrderIds()
+    {
         if (!$this->_realOrderIds) {
             if ($this->_cybermutResponse) {
                 $this->_realOrderIds = explode(',', $this->_cybermutResponse['reference']);
@@ -66,7 +68,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      * @param array $response
      * @return object $this
      */
-    protected function setCybermutResponse($response) {
+    protected function setCybermutResponse($response)
+    {
         if (count($response)) {
             $this->_cybermutResponse = $response;
         }
@@ -77,7 +80,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      * When a customer chooses Cybermut on Checkout/Payment page
      *
      */
-    public function redirectAction() {
+    public function redirectAction()
+    {
         $session = Mage::getSingleton('checkout/session');
         $session->setCybermutPaymentQuoteId($session->getLastQuoteId());
 
@@ -117,7 +121,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      *  @param    none
      *  @return	  void
      */
-    public function notifyAction() {
+    public function notifyAction()
+    {
         $model = Mage::getModel('cybermut/payment');
 
         if ($this->getRequest()->isPost()) {
@@ -237,7 +242,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      *  @param    Mage_Sales_Model_Order $order
      *  @return	  boolean Can save invoice or not
      */
-    protected function saveInvoice(Mage_Sales_Model_Order $order, $ship = false) {
+    protected function saveInvoice(Mage_Sales_Model_Order $order, $ship = false)
+    {
         if ($order->canInvoice()) {
             $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
             $invoice->register()->capture();
@@ -265,7 +271,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      *  @param    none
      *  @return	  void
      */
-    public function successAction() {
+    public function successAction()
+    {
         $session = Mage::getSingleton('checkout/session');
         $session->setQuoteId($session->getCybermutPaymentQuoteId());
         $session->unsCybermutPaymentQuoteId();
@@ -309,7 +316,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      *  @param    none
      *  @return	  void
      */
-    public function errorAction() {
+    public function errorAction()
+    {
         $session = Mage::getSingleton('checkout/session');
         $model = Mage::getModel('cybermut/payment');
 
@@ -342,7 +350,8 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
         $this->_redirect($this->_getErrorRedirect());
     }
 
-    protected function _reorder() {
+    protected function _reorder()
+    {
         $cart = Mage::getSingleton('checkout/cart');
         $cartTruncated = false;
         /* @var $cart Mage_Checkout_Model_Cart */
@@ -372,14 +381,16 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
         $cart->save();
     }
 
-    protected function _getSuccessRedirect() {
+    protected function _getSuccessRedirect()
+    {
         if ($this->getQuote()->getIsMultiShipping())
             return 'checkout/multishipping/success';
         else
             return 'checkout/onepage/success';
     }
 
-    protected function _getErrorRedirect() {
+    protected function _getErrorRedirect()
+    {
         if ($this->getQuote()->getIsMultiShipping()) {
             return 'checkout/cart';
         } else {
