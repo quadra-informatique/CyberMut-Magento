@@ -22,6 +22,16 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
     protected $_quote;
 
     /**
+     * Get current Cybermut Method Instance
+     *
+     * @return Quadra_Cybermut_Model_Payment
+     */
+    public function getMethodInstance()
+    {
+        return Mage::getSingleton('cybermut/payment');
+    }
+
+    /**
      * Get quote model
      *
      * @return Mage_Sales_Model_Quote
@@ -98,6 +108,10 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
             $order->loadByIncrementId($realOrderId);
 
             if (!$order->getId()) {
+                // Debug data when order can not be loaded
+                $this->getMethodInstance()->debugData($realOrderIds);
+                $this->getMethodInstance()->debugData($session->getData());
+
                 $this->norouteAction();
                 return;
             }
@@ -123,7 +137,7 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
      */
     public function notifyAction()
     {
-        $model = Mage::getModel('cybermut/payment');
+        $model = $this->getMethodInstance();
 
         if ($this->getRequest()->isPost()) {
             $postData = $this->getRequest()->getPost();
@@ -137,7 +151,7 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
 
         $this->setCybermutResponse($postData);
 
-        if ($model->getConfigData('debug_flag')) {
+        if ($model->getDebugFlag()) {
             Mage::getModel('cybermut/api_debug')
                     ->setResponseBody(print_r($postData, 1))
                     ->save();
@@ -319,7 +333,7 @@ class Quadra_Cybermut_PaymentController extends Mage_Core_Controller_Front_Actio
     public function errorAction()
     {
         $session = Mage::getSingleton('checkout/session');
-        $model = Mage::getModel('cybermut/payment');
+        $model = $this->getMethodInstance();
 
         $session->setIsMultishipping(false);
 
