@@ -238,3 +238,5 @@
 /app/code/community/Quadra/Extensions/
 /app/etc/modules/Quadra_Extensions.xml
 /0
+/dev/
+/app/bootstrap.php
