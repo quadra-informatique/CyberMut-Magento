@@ -14,34 +14,37 @@
  * @license http://www.opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 ?>
+<?php $_code = $this->getMethodCode() ?>
+<div class="form-list" style="display: inline-block">
+    <img style="float: left" src="<?php echo $this->getSkinUrl('images/media/cybermut/cb.gif') ?>" alt="CB" />
+    <img style="float: left" src="<?php echo $this->getSkinUrl('images/media/cybermut/master.gif') ?>" alt="Mastercard" />
+    <img style="float: left" src="<?php echo $this->getSkinUrl('images/media/cybermut/visa.gif') ?>" alt="Visa" />
+</div>
 
-<img src="<?php echo $this->getSkinUrl('images/media/cybermut/cb.gif') ?>" alt="CB" />
-<img src="<?php echo $this->getSkinUrl('images/media/cybermut/master.gif') ?>" alt="Mastercard" />
-<img src="<?php echo $this->getSkinUrl('images/media/cybermut/visa.gif') ?>" alt="Visa" />
-<br /><br />
-
-<fieldset class="form-list">
-    <?php $_code = $this->getMethodCode() ?>
-    <ul id="payment_form_<?php echo $_code ?>" style="display:none">
-        <?php if (Mage::getStoreConfig('payment/cybermut_payment/several_times_payment')): ?>
-            <li class="control">
-                <input type="checkbox" name="cybermut[several_implements]" id="cybermut:several_implements" value="<?php echo Mage::getStoreConfig('payment/cybermut_payment/terms') ?>" title="<?php echo $this->__('Payment %s times', Mage::getStoreConfig('payment/cybermut_payment/terms')) ?>" class="checkbox" onclick="setNbrech()" />
-                <label for="cybermut:several_implements"><?php echo $this->__('Payment %s times', Mage::getStoreConfig('payment/cybermut_payment/terms')) ?></label>
-                <input type="hidden" id="payment:nbrech" name="payment[nbrech]" value="1" />
-            </li>
-            <script type="text/javascript">
-                //<![CDATA[
-                function setNbrech() {
-                    if ($('cybermut:several_implements').checked)
-                        $('payment:nbrech').value = $('cybermut:several_implements').value;
-                    else
-                        $('payment:nbrech').value = 1;
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
+    <?php if ($_code == 'cybermut_several'): ?>
+    <li class="control">
+        <input type="checkbox" name="cybermut[several_implements]" id="<?php echo $_code ?>_several_implements" value="<?php echo Mage::getStoreConfig('payment/cybermut_several/terms') ?>" title="<?php echo $this->__('Payment %s times', Mage::getStoreConfig('payment/cybermut_several/terms')) ?>" class="checkbox" />
+        <label for="<?php echo $_code ?>_several_implements"><?php echo $this->__('Payment %s times', Mage::getStoreConfig('payment/cybermut_several/terms')) ?></label>
+        <input type="hidden" id="<?php echo $_code ?>_nbrech" name="payment[nbrech]" value="1" />
+        <script type="text/javascript">
+        //<![CDATA[
+            var NTChecked<?php echo $_code ?> = function() {
+                var elm = $('<?php echo $_code ?>_several_implements');
+                if (elm.checked) {
+                    $('<?php echo $_code ?>_nbrech').value = elm.value;
+                } else {
+                    $('<?php echo $_code ?>_nbrech').value = 1;
                 }
-                //]]>
-            </script>
-        <?php endif; ?>
-        <li>
-            <?php echo $this->__('You will be redirected to Cybermut website when you place an order.') ?>
-        </li>
-    </ul>
-</fieldset>
+            };
+
+            Event.observe($('<?php echo $_code ?>_several_implements'), 'click', NTChecked<?php echo $_code ?>);
+            NTChecked<?php echo $_code ?>();
+        //]]>
+        </script>
+    </li>
+    <?php endif; ?>
+    <li>
+        <?php echo $this->__('You will be redirected to Cybermut website when you place an order.') ?>
+    </li>
+</ul>

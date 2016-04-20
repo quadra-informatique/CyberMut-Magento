@@ -19,14 +19,14 @@ class Quadra_Cybermut_Block_Redirect extends Mage_Core_Block_Abstract
 
     protected function _toHtml()
     {
-        $standard = Mage::getModel('cybermut/payment');
+        $methodInstance = $this->getMethodInstance();
         $form = new Varien_Data_Form();
-        $form->setAction($standard->getCybermutUrl())
+        $form->setAction($methodInstance->getCybermutUrl())
                 ->setId('cybermut_payment_checkout')
                 ->setName('cybermut_payment_checkout')
                 ->setMethod('POST')
                 ->setUseContainer(true);
-        foreach ($standard->setOrder($this->getOrder())->getStandardCheckoutFormFields() as $field => $value) {
+        foreach ($methodInstance->setOrder($this->getOrder())->getFormFields() as $field => $value) {
             $form->addField($field, 'hidden', array('name' => $field, 'value' => $value));
         }
 
@@ -38,7 +38,7 @@ class Quadra_Cybermut_Block_Redirect extends Mage_Core_Block_Abstract
         $html.= '<script type="text/javascript">document.getElementById("cybermut_payment_checkout").submit();</script>';
         $html.= '</body></html>';
 
-        if ($standard->getConfigData('debug_flag')) {
+        if ($methodInstance->getConfigData('debug_flag')) {
             Mage::getModel('cybermut/api_debug')
                     ->setRequestBody($formHTML)
                     ->save();

@@ -176,9 +176,15 @@
                 <allowspecific>0</allowspecific>
                 <transaction_type>O</transaction_type>
                 <empty_cart>1</empty_cart>
-                <several_times_payment>0</several_times_payment>
-                <terms>3</terms>
             </cybermut_payment>
+            <cybermut_several>
+                <model>cybermut/several</model>
+                <title>Paiement en plusieurs fois</title>
+                <allowspecific>0</allowspecific>
+                <transaction_type>O</transaction_type>
+                <empty_cart>1</empty_cart>
+                <terms>3</terms>
+            </cybermut_several>
         </payment>
     </default>
 </config>

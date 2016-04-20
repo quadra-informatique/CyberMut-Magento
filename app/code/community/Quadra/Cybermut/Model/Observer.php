@@ -40,7 +40,11 @@ class Quadra_Cybermut_Model_Observer
 
             if (!(strpos($order->getPayment()->getMethod(), 'cybermut') === false)) {
                 Mage::getSingleton('checkout/session')->setRealOrderIds(implode(',', $orderIds));
-                Mage::app()->getResponse()->setRedirect(Mage::getUrl('cybermut/payment/redirect'));
+                if ($order->getPayment()->getMethod() == 'cybermut_several') {
+                    Mage::app()->getResponse()->setRedirect(Mage::getUrl('cybermut/several/redirect'));
+                } else {
+                    Mage::app()->getResponse()->setRedirect(Mage::getUrl('cybermut/payment/redirect'));
+                }
             }
         } else {
             Mage::getSingleton('checkout/session')->unsRealOrderIds();
