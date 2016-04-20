@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 1997-2015 Quadra Informatique
+ * 1997-2016 Quadra Informatique
  *
  * NOTICE OF LICENSE
  *
@@ -10,8 +10,8 @@
  * If you are unable to obtain it through the world-wide-web, please send an email
  * to modules@quadra-informatique.fr so we can send you a copy immediately.
  *
- * @author Quadra Informatique <modules@quadra-informatique.fr>
- * @copyright 1997-2015 Quadra Informatique
+ * @author Quadra Informatique
+ * @copyright 1997-2016 Quadra Informatique
  * @license http://www.opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 class Quadra_Cybermut_Helper_Data extends Mage_Core_Helper_Abstract
