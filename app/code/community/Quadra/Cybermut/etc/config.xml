@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * 1997-2015 Quadra Informatique
+ * 1997-2016 Quadra Informatique
  *
  * NOTICE OF LICENSE
  *
@@ -10,8 +10,8 @@
  * If you are unable to obtain it through the world-wide-web, please send an email
  * to modules@quadra-informatique.fr so we can send you a copy immediately.
  *
- * @author Quadra Informatique <modules@quadra-informatique.fr>
- * @copyright 1997-2015 Quadra Informatique
+ * @author Quadra Informatique
+ * @copyright 1997-2016 Quadra Informatique
  * @license http://www.opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
 -->
@@ -176,9 +176,15 @@
                 <allowspecific>0</allowspecific>
                 <transaction_type>O</transaction_type>
                 <empty_cart>1</empty_cart>
-                <several_times_payment>0</several_times_payment>
-                <terms>3</terms>
             </cybermut_payment>
+            <cybermut_several>
+                <model>cybermut/several</model>
+                <title>Paiement en plusieurs fois</title>
+                <allowspecific>0</allowspecific>
+                <transaction_type>O</transaction_type>
+                <empty_cart>1</empty_cart>
+                <terms>3</terms>
+            </cybermut_several>
         </payment>
     </default>
 </config>

@@ -14,7 +14,16 @@
  * @copyright 1997-2016 Quadra Informatique
  * @license http://www.opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  */
-class Quadra_Cybermut_Helper_Data extends Mage_Core_Helper_Abstract
+class Quadra_Cybermut_SeveralController extends Quadra_Cybermut_Controller_Action
 {
+    /**
+     * Get current Cybermut Method Instance
+     *
+     * @return Quadra_Cybermut_Model_Several
+     */
+    public function getMethodInstance()
+    {
+        return Mage::getSingleton('cybermut/several');
+    }
 
 }
