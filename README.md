@@ -21,7 +21,7 @@ Per to the OSL 3 License, the Original Work is provided under this License on an
 
 ## Contributing
 
-This module is an **open-source extension** to the PrestaShop e-commerce solution. Everyone is welcome and even encouraged to contribute with their own improvements.
+This module is an **open-source extension** to the Magento e-commerce solution. Everyone is welcome and even encouraged to contribute with their own improvements.
 
 ### Requirements for contributing
 
@@ -37,7 +37,7 @@ Contributors wishing to edit a module's files should follow the following proces
 
 1. Create your GitHub account, if you do not have one already.
 2. Fork the ganalytics project to your GitHub account.
-3. Clone your fork to your local machine in the ```/modules``` directory of your PrestaShop installation.
+3. Clone your fork to your local machine in the ```/modules``` directory of your Magento installation.
 4. Create a branch in your local clone of the module for your changes.
 5. Change the files in your branch. Be sure to follow [the coding standards][1]!
 6. Push your changed branch to your fork in your GitHub account.
