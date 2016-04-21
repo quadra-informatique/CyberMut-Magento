@@ -4,6 +4,17 @@ This extension provides CM-CIC p@iement (CyberMUT / CIC payment) integration.
 For payments through Credit Mutuel Group (Credit Mutuel, CIC, OBC).
 Compatible with CM-CIC versions 1.2 and 3.0.
 
+## Merchant Back Office Configuration
+
+In your merchant back office configuration, you have to configure the 2 urls below to keep the module working (merchant payment authorisation).
+
+One time order :
+* [url_website]/cybermut/payment/notify/
+
+Multiple time order :
+* [url_website]/cybermut/several/notify/
+
+
 ## Disclamer
 
 Per to the OSL 3 License, the Original Work is provided under this License on an "AS IS" BASIS and WITHOUT WARRANTY, either express or implied, including, without limitation, the warranties of non-infringement, merchantability or fitness for a particular purpose. THE ENTIRE RISK AS TO THE QUALITY OF THE ORIGINAL WORK IS WITH YOU. This DISCLAIMER OF WARRANTY constitutes an essential part of this License. No license to the Original Work is granted by this License except under this disclaimer.
