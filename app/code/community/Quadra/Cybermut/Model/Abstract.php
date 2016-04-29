@@ -68,6 +68,9 @@ abstract class Quadra_Cybermut_Model_Abstract extends Mage_Payment_Model_Method_
             case 'obc':
                 $url = $this->getConfigData('test_mode') ? 'https://ssl.paiement.banque-obc.fr/test/paiement.cgi' : 'https://ssl.paiement.banque-obc.fr/paiement.cgi';
                 break;
+            case 'monetico':
+                $url = $this->getConfigData('test_mode') ? 'https://p.monetico-services.com/test/paiement.cgi' : 'https://p.monetico-services.com/paiement.cgi';
+                break;
         }
         return $url;
     }
