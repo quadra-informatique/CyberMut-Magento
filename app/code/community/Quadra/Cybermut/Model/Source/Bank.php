@@ -23,6 +23,7 @@ class Quadra_Cybermut_Model_Source_Bank
             array('value' => 'mutuel', 'label' => Mage::helper('cybermut')->__('Credit Mutuel')),
             array('value' => 'cic', 'label' => Mage::helper('cybermut')->__('Groupe CIC')),
             array('value' => 'obc', 'label' => Mage::helper('cybermut')->__('OBC')),
+            array('value' => 'monetico', 'label' => Mage::helper('cybermut')->__('Monetico')),
         );
     }
 
